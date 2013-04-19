@@ -1,4 +1,4 @@
-part of actor;
+part of jester;
 
 class Behavior {
   List<MessageTypes> _keys;

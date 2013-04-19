@@ -1,4 +1,4 @@
-part of actor;
+part of jester;
 
 bool _defaultActorErrorHandler(IsolateUnhandledException ex) {
   Actor.errorHandler(ex);

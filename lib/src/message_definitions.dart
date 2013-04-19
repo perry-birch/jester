@@ -1,15 +1,18 @@
-part of actor;
+part of jester;
 
 class MessageTypes {
-  final String key;
-  const MessageTypes._(this.key);
-  const MessageTypes(String scope, String description)
-      : this._('${scope}__${description}');
-  String toString() => key;
+  final int scope;
+  final int key;
+  const MessageTypes._(this.scope, this.key);
+  const MessageTypes(String scope, String key)
+      : this._(
+          PackedInt.pack(scope),
+          PackedInt.pack(key));
+  String toString() => '${PackedInt.unpack(scope)} - ${PackedInt.unpack(key)}';
   operator |(MessageHandler messageHandler) {
     return new BehaviorHandler(this, messageHandler);
   }
-  operator ==(MessageTypes other) => this.key == other.key;
+  operator ==(MessageTypes other) => this.scope == other.scope && this.key == other.key;
 }
 
 class CommandTypes extends MessageTypes {
