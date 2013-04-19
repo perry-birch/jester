@@ -16,7 +16,7 @@ class ReceivePortProxy {
     return proxy;
   };
 
-  Future<dynamic> where(dynamic predicate, {timeout: 1}) {
+  Future<dynamic> where(dynamic predicate, {timeout: 100}) {
     if(_completer != null) {
       if(!_completer.isCompleted) {
         _completer.completeError('Predicate replaced');
@@ -25,7 +25,7 @@ class ReceivePortProxy {
     }
     _completer = new Completer();
     _predicate = predicate;
-    new Timer(new Duration(seconds:timeout), () {
+    new Timer(new Duration(milliseconds:timeout), () {
       if(!_completer.isCompleted) {
         _completer.completeError('Timeout Expired');
       }

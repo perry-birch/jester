@@ -48,9 +48,9 @@ packed_int_tests() {
       expect(packed, 0x421);
     });
 
-    test('return 000 0100 0010 0001 for aaa', () {
+    test('return 000 0100 0010 0001 for AAA', () {
       // Arrange
-      var value = 'aaa';
+      var value = 'AAA';
 
       // Act
       var packed = PackedInt.pack(value);
@@ -79,7 +79,7 @@ packed_int_tests() {
       var unpacked = PackedInt.unpack(packed);
 
       // Assert
-      expect(unpacked, 'asdfasdf');
+      expect(unpacked, 'ASDFASDF');
     });
 
     test('ignore strings longer than 12 chars', () {
@@ -91,7 +91,19 @@ packed_int_tests() {
       var unpacked = PackedInt.unpack(packed);
 
       // Assert
-      expect(unpacked, 'asdfasdfasdf');
+      expect(unpacked, 'ASDFASDFASDF');
+    });
+
+    test('ignore any non alpha chars (except _)', () {
+      // Arrange
+      var value = '@asdf123!_~asdf123@';
+      var packed = PackedInt.pack(value);
+
+      // Act
+      var unpacked = PackedInt.unpack(packed);
+
+      // Assert
+      expect(unpacked, 'ASDF_ASDF');
     });
 
   });

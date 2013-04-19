@@ -4,14 +4,6 @@ bool _defaultActorErrorHandler(IsolateUnhandledException ex) {
   Actor.errorHandler(ex);
 }
 
-typedef void IsolateLoader();
-typedef bool IsolateErrorHandler(IsolateUnhandledException ex);
-
-typedef SendPort BaseActorCreator(IsolateLoader loader, [IsolateErrorHandler errorHandler]);
-typedef SendPort ActorCreator();
-typedef TProxy ProxyCreator<TProxy>();
-typedef void MessageHandler(Actor actor, dynamic data, SendPort replyTo);
-
 abstract class Actor {
   final ReceivePort _actorPort;
   static const String ROOT_SCOPE = 'ROOT_ACTOR';
