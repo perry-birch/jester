@@ -12,7 +12,7 @@ receive_port_proxy_tests() {
       var command = Message.create(Actor.CONFIGURE_COMMAND, 'data');
 
       var future = proxy.where((message) {
-        return true;
+        return true; // Accept any message that comes through
       });
 
       sutPort.receive((Message message, SendPort replyTo) {
@@ -24,8 +24,7 @@ receive_port_proxy_tests() {
 
       // Assert
       future.then(expectAsync1((Message message) {
-        print('got message: ${message.type}');
-        expect(message, null);
+        expect(message.data, 'data');
       }));
     });
 
