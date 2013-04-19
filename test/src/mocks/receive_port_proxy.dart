@@ -4,14 +4,14 @@ part of jester_test;
 // Create actor directly in test to make calls easier!
 class ReceivePortProxy {
   final ReceivePort receivePort;
-  final SendPort sendPort;
+  SendPort get sendPort => receivePort.toSendPort();
   Completer _completer;
   dynamic _predicate;
 
-  ReceivePortProxy._(this.receivePort, this.sendPort);
+  ReceivePortProxy._(this.receivePort);
 
   static final dynamic wrap = (ReceivePort receivePort) {
-    var proxy = new ReceivePortProxy._(receivePort, receivePort.toSendPort());
+    var proxy = new ReceivePortProxy._(receivePort);
     receivePort.receive(proxy.receivePortHandler);
     return proxy;
   };
@@ -38,6 +38,10 @@ class ReceivePortProxy {
       if(_completer.isCompleted) { return; }
       _completer.complete(message);
     }
+  }
+
+  void close() {
+    receivePort.close();
   }
 }
 

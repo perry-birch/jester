@@ -25,7 +25,10 @@ receive_port_proxy_tests() {
       // Assert
       future.then(expectAsync1((Message message) {
         expect(message.data, 'data');
+        sutPort.close();
       }));
+
+
     });
 
   });
