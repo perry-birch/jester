@@ -41,7 +41,7 @@ Installation
 License
 ----
 
-https://github.com/Vizidrix/deny/blob/master/LICENSE
+https://github.com/Vizidrix/jester/blob/master/LICENSE
 
 ----
 ## Edited
