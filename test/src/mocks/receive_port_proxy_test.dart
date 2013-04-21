@@ -4,32 +4,46 @@ receive_port_proxy_tests() {
 
   group('-receive_port_proxy- should', () {
 
-    test('wrap a receive port', () {
+   /* test('wrap a receive port', () {
       // Arrange
-      var proxy = ReceivePortProxy.wrap(new ReceivePort());
-      ReceivePort sutPort = new ReceivePort(); // Isolate port
+      var outerCompleter = new Completer<IDisposable>();
+      usingAsync(new SafeReceivePort(), (SafeReceivePort proxy) {
+        var innerCompleter = new Completer<IDisposable>();
 
-      var command = Message.create(Actor.CONFIGURE_COMMAND, 'data');
+        usingAsync(new ReceivePortProxy(), (ReceivePortProxy sutPort) {
 
-      var future = proxy.where((message) {
-        return true; // Accept any message that comes through
+          var command = Message.create(Actor.CONFIGURE_COMMAND, 'data');
+
+
+          Timer.run(() {
+            innerCompleter.complete(sutPort);
+            outerCompleter.complete(proxy);
+          });
+
+          return innerCompleter.future;
+        });
+        return outerCompleter.future;
       });
 
-      sutPort.receive((Message message, SendPort replyTo) {
-        replyTo.send(message, replyTo); // Echo back to the caller
-      });
-
-      // Act
-      sutPort.toSendPort().send(command, proxy.sendPort);
-
-      // Assert
-      future.then(expectAsync1((Message message) {
-        expect(message.data, 'data');
-        sutPort.close();
-      }));
-
-
-    });
+    });*/
 
   });
 }
+
+/*var future = proxy.where((message) {
+return true; // Accept any message that comes through
+});*/
+
+/*sutPort.receivePort.receive((Message message, SendPort replyTo) {
+replyTo.send(message, replyTo); // Echo back to the caller
+});
+
+// Act
+sutPort.sendPort.send(command, proxy.sendPort);
+
+// Assert
+future.then(expectAsync1((Message message) {
+expect(message.data, 'data');
+innerCompleter.complete(sutPort);
+outerCompleter.complete(proxy);
+}));*/

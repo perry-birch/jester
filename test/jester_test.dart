@@ -15,6 +15,7 @@ part 'src/mocks/receive_port_proxy_test.dart';
 part 'src/actor_test.dart';
 part 'src/message_definitions_test.dart';
 part 'src/packed_int_test.dart';
+part 'src/safe_receive_port_test.dart';
 
 main() {
 
@@ -25,5 +26,5 @@ main() {
   actor_tests();
   message_definitions_tests();
   packed_int_tests();
-
+  safe_receive_port_tests();
 }

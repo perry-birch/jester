@@ -5,9 +5,14 @@ actor_tests() {
   group('-actor- should', () {
 
     test('do stuff', () {
-      var testPort = ReceivePortProxy.wrap(new ReceivePort());
-      var sutPort = new ReceivePort();
-      var mockActor = new MockActor(sutPort);
+      /*using(new ReceivePortProxy(), (ReceivePortProxy testPort) {
+        using(new ReceivePortProxy(), (ReceivePortProxy sutPort) {
+
+          var mockActor = new MockActor(sutPort.receivePort);
+
+        });
+      });*/
+
 
       //expect(true, false, reason: 'do stuff');
     });

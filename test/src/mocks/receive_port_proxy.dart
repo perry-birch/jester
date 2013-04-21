@@ -2,13 +2,21 @@ part of jester_test;
 
 // TODO: Wrap receive port in List<Future> or stream
 // Create actor directly in test to make calls easier!
-class ReceivePortProxy {
+class ReceivePortProxy implements IDisposable {
   final ReceivePort receivePort;
   SendPort get sendPort => receivePort.toSendPort();
   Completer _completer;
   dynamic _predicate;
 
   ReceivePortProxy._(this.receivePort);
+
+  factory ReceivePortProxy() {
+    var receivePort = new ReceivePort();
+    receivePort.receive((dynamic message, SendPort replyTo) {
+
+    });
+    return new ReceivePortProxy._(new ReceivePort());
+  }
 
   static final dynamic wrap = (ReceivePort receivePort) {
     var proxy = new ReceivePortProxy._(receivePort);
@@ -40,7 +48,8 @@ class ReceivePortProxy {
     }
   }
 
-  void close() {
+  void dispose() {
+    //print('closed proxy');
     receivePort.close();
   }
 }
