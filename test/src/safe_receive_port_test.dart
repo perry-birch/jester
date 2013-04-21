@@ -17,17 +17,100 @@ safe_receive_port_tests() {
      safePort.dispose();
     });
 
-    test('be able to receive a message without registering callback manually', () {
+    test('fail to receive a message without registering callback manually', () {
       // Arrange
-      var recPort = new ReceivePort();
-      SafeReceivePort safePort = new SafeReceivePort(recPort);
-
-      //SendPort sender = new ReceivePort().toSendPort();
+      ReceivePort recPort = new ReceivePort();
+      SendPort sendPort = recPort.toSendPort();
+      bool caught = false;
 
       // Act
-      safePort.toSendPort().send('stuff', safePort.toSendPort());
+      // Sending to a ReceivePort without a registered receive
+      // triggers an untrappable error
+      try {
+        throw('cannot proceed...');
+        sendPort.send('stuff', sendPort);
+      } catch(ex) {
+        caught = true;
+      } finally {
+        recPort.close();
+      }
 
       // Assert
+      expect(caught, isTrue);
+    });
+
+    test('be able to receive a message without registering callback manually', () {
+      // Arrange
+      SafeReceivePort safePort = new SafeReceivePort();
+      SendPort sendPort = safePort.toSendPort();
+
+      // Act
+      // Safeport adds a default receive callback
+      sendPort.send('stuff', sendPort);
+
+      // Assert
+
+      safePort.dispose();
+    });
+
+    test('trigger stream event when message is received', () {
+      // Arrange
+      SafeReceivePort safePort = new SafeReceivePort();
+      SendPort sendPort = safePort.toSendPort();
+      ReceivedMessage message;
+
+      Future<ReceivedMessage> future = safePort.messages.first;
+
+      // Act
+      sendPort.send('stuff', sendPort);
+
+      future.then(expectAsync1((ReceivedMessage receivedMessage) {
+        message = receivedMessage;
+
+        // Assert
+        expect(message, isNotNull);
+        expect(message.message.data, 'stuff');
+
+        safePort.dispose();
+      }));
+    });
+
+    test('trigger provided callback method if one has been provided', () {
+      // Arrange
+      SafeReceivePort safePort = new SafeReceivePort();
+      SendPort sendPort = safePort.toSendPort();
+      var message = null;
+      safePort.receive((dynamic data, SendPort replyTo) {
+        message = data;
+      });
+
+      Future<ReceivedMessage> future = safePort.messages.first;
+
+      // Act
+      sendPort.send('stuff', sendPort);
+
+      future.then(expectAsync1((ReceivedMessage receivedMessage) {
+        // Assert
+        expect(message, isNotNull);
+        expect(message, 'stuff');
+
+        safePort.dispose();
+      }));
+    });
+
+    test('throw an exception if null callback is set', () {
+      // Arrange
+      SafeReceivePort safePort = new SafeReceivePort();
+      var error = null;
+
+      // Act
+      try {
+        safePort.receive(null);
+      } catch(ex) {
+        error = ex;
+      }
+
+      expect(error, isNotNull);
 
       safePort.dispose();
     });
