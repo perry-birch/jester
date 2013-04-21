@@ -8,7 +8,7 @@ actor_tests() {
       // Arrange
       ReceivePort receivePort = new ReceivePort();
 
-
+      receivePort.close();
       /*using(new ReceivePortProxy(), (ReceivePortProxy testPort) {
         using(new ReceivePortProxy(), (ReceivePortProxy sutPort) {
 
