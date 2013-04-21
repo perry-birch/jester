@@ -5,8 +5,8 @@ bool _defaultActorErrorHandler(IsolateUnhandledException ex) {
 }
 
 abstract class Actor {
-  final ReceivePort _actorPort;
-  static const String ROOT_SCOPE = 'ROOT_ACTOR';
+  final SafeReceivePort _actorPort;
+  static const String ROOT_SCOPE = 'JESTER';
 
   // Define 'unhandled' message keys
   static const MessageTypes INVALID_EVENT = const MessageTypes(ROOT_SCOPE, 'INVALID_EVENT');
@@ -21,8 +21,15 @@ abstract class Actor {
   static const EventTypes INVALID_EVENT_EVENT = const EventTypes(ROOT_SCOPE, 'INVALID_EVENT_EVENT');
   static const EventTypes INVALID_COMMAND_EVENT = const EventTypes(ROOT_SCOPE, 'INVALID_COMMAND_EVENT');
 
-  Actor(ReceivePort this._actorPort) {
-    this._actorPort.receive(handler);
+  Actor._(SafeReceivePort this._actorPort);
+
+  Actor(ReceivePort actorPort) {
+    // If the provided receive port isn't already safe then upgrage it
+    if(actorPort is! SafeReceivePort) {
+      actorPort = new SafeReceivePort(actorPort);
+    }
+    actorPort.receive(handler);
+    //return new Actor._(actorPort);
   }
 
   static final ActorCreator create = (IsolateLoader loader, [IsolateErrorHandler errorHandler]) {

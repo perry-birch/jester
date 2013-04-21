@@ -10,6 +10,10 @@ class SafeReceivePort implements ReceivePort, IDisposable {
   SafeReceivePort._(ReceivePort this._receivePort);
 
   factory SafeReceivePort([ReceivePort receivePort]) {
+    return SafeReceivePort.create(receivePort);
+  }
+
+  static final dynamic create = ([ReceivePort receivePort]) {
     if(receivePort == null) {
       receivePort = new ReceivePort();
     }
@@ -19,7 +23,7 @@ class SafeReceivePort implements ReceivePort, IDisposable {
       safeReceivePort._streamController.add(new ReceivedMessage(message, replyTo));
     });
     return safeReceivePort;
-  }
+  };
 
   Stream<ReceivedMessage> get messages => _streamController.stream;
 

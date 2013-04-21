@@ -4,7 +4,11 @@ actor_tests() {
 
   group('-actor- should', () {
 
-    test('do stuff', () {
+    test('upgrade provided ReceviePort to SafeReceivePort if basic is provided', () {
+      // Arrange
+      ReceivePort receivePort = new ReceivePort();
+
+
       /*using(new ReceivePortProxy(), (ReceivePortProxy testPort) {
         using(new ReceivePortProxy(), (ReceivePortProxy sutPort) {
 

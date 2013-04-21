@@ -4,6 +4,7 @@ safe_receive_port_tests() {
 
   group('-safe_receive_port- should', () {
 
+    // This is prety much just for demonstration
     test('wrap a receive port', () {
       // Arrange
      var recPort = new ReceivePort();
@@ -17,6 +18,8 @@ safe_receive_port_tests() {
      safePort.dispose();
     });
 
+    // This is to prove the deficiency of built in ReceivePort
+    // If the throw line is commented then the untrappable error shows up
     test('fail to receive a message without registering callback manually', () {
       // Arrange
       ReceivePort recPort = new ReceivePort();
@@ -95,6 +98,30 @@ safe_receive_port_tests() {
         expect(message, 'stuff');
 
         safePort.dispose();
+      }));
+    });
+
+    test('trigger provided callback method if one has been provided via using', () {
+      // Arrange
+      var message = null;
+      usingAsync(new SafeReceivePort(), (SafeReceivePort safePort) {
+
+        safePort.receive((dynamic data, SendPort replyTo) {
+          message = data;
+        });
+
+        SendPort sendPort = safePort.toSendPort();
+
+        // Act
+        sendPort.send('stuff', sendPort);
+
+        return safePort.messages.first;
+
+      }).then(expectAsync1((ReceivedMessage receivedMessage) {
+
+        // Assert
+        expect(message, isNotNull);
+        expect(message, 'stuff');
       }));
     });
 
