@@ -10,6 +10,12 @@
   
 ----
 
+There are some supporting libaries embedded in this one (which may/will be relocated elsewhere in the future)
+
+https://github.com/Vizidrix/jester/blob/master/docs/disposable.md
+
+----
+
 There are just a few core concepts to implement an actor graph, however implementation is the easy part...
 
 > If you aren't familiar with DDD *Domain Driven Design* then I suggest reading up on it, fun stuff!

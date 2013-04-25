@@ -1,7 +1,5 @@
 part of jester;
 
-typedef void ReceivePortCallback<T>(T arg, SendPort replyTo);
-
 class SafeReceivePort implements ReceivePort, IDisposable {
   final StreamController<ReceivedMessage> _streamController = new StreamController<ReceivedMessage>();
   final ReceivePort _receivePort;
@@ -10,10 +8,6 @@ class SafeReceivePort implements ReceivePort, IDisposable {
   SafeReceivePort._(ReceivePort this._receivePort);
 
   factory SafeReceivePort([ReceivePort receivePort]) {
-    return SafeReceivePort.create(receivePort);
-  }
-
-  static final dynamic create = ([ReceivePort receivePort]) {
     if(receivePort == null) {
       receivePort = new ReceivePort();
     }
@@ -23,6 +17,10 @@ class SafeReceivePort implements ReceivePort, IDisposable {
       safeReceivePort._streamController.add(new ReceivedMessage(message, replyTo));
     });
     return safeReceivePort;
+  }
+
+  static final dynamic create = ([ReceivePort receivePort]) {
+    return new SafeReceivePort(receivePort);
   };
 
   Stream<ReceivedMessage> get messages => _streamController.stream;

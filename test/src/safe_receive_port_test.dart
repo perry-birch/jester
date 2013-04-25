@@ -62,6 +62,7 @@ safe_receive_port_tests() {
       SendPort sendPort = safePort.toSendPort();
       ReceivedMessage message;
 
+      // Attaches to the port and gets a future representing the first value emitted
       Future<ReceivedMessage> future = safePort.messages.first;
 
       // Act
@@ -87,6 +88,7 @@ safe_receive_port_tests() {
         message = data;
       });
 
+      // This is used to coordinate the expects below
       Future<ReceivedMessage> future = safePort.messages.first;
 
       // Act
@@ -122,6 +124,8 @@ safe_receive_port_tests() {
         // Assert
         expect(message, isNotNull);
         expect(message, 'stuff');
+
+        // safePort.dispose() is omitted, using handles dispose
       }));
     });
 
