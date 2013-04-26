@@ -4,7 +4,9 @@ part of jester;
 
 /// Marks a class which contains references that should be cleaned up after their use
 abstract class IDisposable {
-  void dispose();
+  void dispose(); // Triggers cleanup on the target disposable
+  void disposeWith(dynamic value); // Triggers cleanup on the target disposable and passes the value to the Future listener
+  Future onDispose;
 }
 
 /// Provides a stand-alone implementation of ensuring clean-up callback which doesn't require sub classing
@@ -12,6 +14,8 @@ class Disposable implements IDisposable {
   final DisposableCallback _callback;
   bool _isDisposed = false;
   bool get isDisposed => _isDisposed;
+  Completer _onDispose = new Completer();
+  Future get onDispose => _onDispose.future;
 
   Disposable._(DisposableCallback this._callback);
 
@@ -25,6 +29,7 @@ class Disposable implements IDisposable {
     if(_isDisposed) { return; }
     _isDisposed = true;
     _callback();
+    _onDispose.complete();
   }
 }
 

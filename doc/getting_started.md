@@ -12,7 +12,7 @@
 
 There are some supporting libaries embedded in this one (which may/will be relocated elsewhere in the future)
 
-https://github.com/Vizidrix/jester/blob/master/docs/disposable.md
+https://github.com/Vizidrix/jester/blob/master/doc/disposable.md
 
 ----
 

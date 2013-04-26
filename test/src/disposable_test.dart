@@ -70,7 +70,7 @@ disposable_tests() {
       int disposedCount = 0;
       IDisposable disposable = Disposable.create(() => disposedCount++);
 
-      IDisposable compositeDisposable = CompositeDisposable.empty();
+      CompositeDisposable compositeDisposable = CompositeDisposable.empty();
 
       // Act
       compositeDisposable.dispose();
@@ -86,7 +86,7 @@ disposable_tests() {
       int disposedCount = 0;
       IDisposable disposable = Disposable.create(() => disposedCount++);
 
-      IDisposable compositeDisposable = CompositeDisposable.fromDisposables([disposable]);
+      CompositeDisposable compositeDisposable = CompositeDisposable.fromDisposables([disposable]);
       expect(disposedCount, 0, reason: 'should not have been disposed yet');
 
       // Act
@@ -102,7 +102,7 @@ disposable_tests() {
       IDisposable disposable1 = Disposable.create(() => disposedCount++);
       IDisposable disposable2 = Disposable.create(() => disposedCount++);
 
-      IDisposable compositeDisposable = CompositeDisposable.fromDisposables([disposable1]);
+      CompositeDisposable compositeDisposable = CompositeDisposable.fromDisposables([disposable1]);
 
       expect(disposedCount, 0, reason: 'should not have been disposed yet');
 
@@ -121,7 +121,7 @@ disposable_tests() {
       int disposedCount = 0;
       IDisposable disposable = Disposable.create(() => disposedCount++);
 
-      IDisposable compositeDisposable = CompositeDisposable.empty();
+      CompositeDisposable compositeDisposable = CompositeDisposable.empty();
 
       // Act
       compositeDisposable.add(Disposable.create(() => disposedCount++));
