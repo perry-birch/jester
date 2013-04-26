@@ -1,40 +1,68 @@
 part of jester;
 
 // TODO: Move this to another library
+// Disposable
+typedef void UsingFunction(IDisposable target);
+typedef Future<T> UsingAsyncFunction<T>(IDisposable target);
+typedef Future<T> UsingAsync<T>(IDisposable target, UsingAsyncFunction<T> func);
+//typedef void DisposableCallback([dynamic value]);
 
 /// Marks a class which contains references that should be cleaned up after their use
 abstract class IDisposable {
-  void dispose(); // Triggers cleanup on the target disposable
-  void disposeWith(dynamic value); // Triggers cleanup on the target disposable and passes the value to the Future listener
-  Future onDispose;
+  void dispose([dynamic value]); // Triggers cleanup on the target disposable
+}
+
+abstract class IFutureDisposable implements IDisposable {
+  void disposeError(dynamic error); // Triggers cleanup on the target disposable and passes the error to the Future listener
+  Future get disposed;
 }
 
 /// Provides a stand-alone implementation of ensuring clean-up callback which doesn't require sub classing
-class Disposable implements IDisposable {
-  final DisposableCallback _callback;
+class Disposable implements IFutureDisposable {
+  static dynamic noop = () { };
+  static dynamic noop1 = (dynamic value) { };
+  final dynamic _callback;
+  final dynamic _onData;
   bool _isDisposed = false;
   bool get isDisposed => _isDisposed;
   Completer _onDispose = new Completer();
-  Future get onDispose => _onDispose.future;
+  Future get disposed => _onDispose.future;
 
-  Disposable._(DisposableCallback this._callback);
+  Disposable._([dynamic callback(), dynamic onData(dynamic value)])
+    : this._callback = callback != null ? callback : Disposable.noop,
+        this._onData = onData != null ? onData : Disposable.noop1;
 
-  static final dynamic create = ([DisposableCallback callback]) {
-    if(callback == null) { callback = () { }; }
-    return new Disposable._(callback);
-  };
+  /*
+   * Creates a disposable instance which triggers (if provided) the supplied callback, potentially with a completing value
+   */
+  factory Disposable([dynamic callback(), dynamic onData(dynamic value)]) {
+    return new Disposable._(callback, onData);
+  }
 
-  /// Dispose cannot be called multiple times on the same instance
-  void dispose() {
+  /*
+   * Triggers the cleanup callback provided to the disposable
+   * Dispose cannot be called multiple times on the same instance
+   */
+  void dispose([dynamic value]) {
     if(_isDisposed) { return; }
     _isDisposed = true;
     _callback();
-    _onDispose.complete();
+    if(value != null) {
+      _onData(value);
+    }
+    _onDispose.complete(value);
+  }
+
+  void disposeError(dynamic error) {
+    if(_isDisposed) { return; }
+    _isDisposed = true;
+    _callback(error);
+    _onDispose.completeError(error);
   }
 }
 
 /// Provides a stand-alone implementation of ensuring a batch of disposable instances are all cleaned-up
-class CompositeDisposable implements IDisposable {
+class CompositeDisposable implements IFutureDisposable {
   final List<IDisposable> _disposables;
   bool _isDisposed = false;
   bool get isDisposed => _isDisposed;
@@ -42,14 +70,14 @@ class CompositeDisposable implements IDisposable {
   CompositeDisposable._(Iterable<IDisposable> this._disposables);
 
   /// Instantiates a composite which immediately wraps the provided set of disposables
-  static final dynamic fromDisposables = (Iterable<IDisposable> disposables) {
+  factory CompositeDisposable.fromDisposables(Iterable<IDisposable> disposables) {
     return new CompositeDisposable._(disposables);
-  };
+  }
 
   /// Instantiates a composite which has no implicit set of disposables
-  static final dynamic empty = () {
+  factory CompositeDisposable.empty() {
     return new CompositeDisposable._([]);
-  };
+  }
 
   /// Appends a disposable instance into the set controlled by this composite
   void add(IDisposable disposable) {
@@ -100,10 +128,14 @@ void using(IDisposable disposable, UsingFunction func) {
 /// Provides a method of encapsulating a series of actions which ensure proper disposal of
 /// the disposable instance prior to exiting but following the completion of a Future value
 /// which is expected to be emitted from the contained code block
-Future usingAsync(IDisposable disposable, UsingAsyncFunction func) {
-  Future future = func(disposable);
-  future.then((dynamic ignored) {
-    disposable.dispose();
-  });
-  return future;
+Future usingAsync(IFutureDisposable disposable, UsingAsyncFunction func) {
+  return func(disposable).then(
+      (value) {
+        disposable.dispose(value);
+        return disposable.disposed;
+      },
+      onError: (error) {
+        disposable.disposeError(error);
+        return disposable.disposed;
+      });
 }

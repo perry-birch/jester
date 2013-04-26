@@ -4,14 +4,14 @@ disposable_tests() {
 
   group('-disposable-', () {
 
-    test('not throw exception on dispose when null callback is provided', () {
+    test('not throw exception on dispose when no callback is provided', () {
       // Arrange
-      IDisposable disposable = Disposable.create(null);
+      IDisposable disposable = new Disposable();
       bool exceptionCaught = false;
 
       // Act
       try {
-      disposable.dispose();
+        disposable.dispose();
       } catch(ex) {
         exceptionCaught = true;
       }
@@ -23,7 +23,7 @@ disposable_tests() {
     test('trigger callback when disposed', () {
       // Arrange
       bool disposed = false;
-      IDisposable disposable = Disposable.create(() => disposed = true);
+      IDisposable disposable = new Disposable(([_]) { disposed = true; });
 
       // Act
       disposable.dispose();
@@ -35,7 +35,8 @@ disposable_tests() {
     test('only trigger dispose method at most once', () {
       // Arrange
       int disposedCount = 0;
-      IDisposable disposable = Disposable.create(() => disposedCount++);
+      var callback = ([_]) { disposedCount++; };
+      IDisposable disposable = new Disposable(callback);
 
       // Act
       disposable.dispose();
@@ -49,11 +50,12 @@ disposable_tests() {
     test('trigger mulitiple callbacks from CompositeDisposable', () {
       // Arrange
       int disposedCount = 0;
-      IDisposable disposable1 = Disposable.create(() => disposedCount++);
-      IDisposable disposable2 = Disposable.create(() => disposedCount++);
-      IDisposable disposable3 = Disposable.create(() => disposedCount++);
+      var callback = ([_]) { disposedCount++; };
+      IDisposable disposable1 = new Disposable(callback);
+      IDisposable disposable2 = new Disposable(callback);
+      IDisposable disposable3 = new Disposable(callback);
 
-      IDisposable compositeDisposable = CompositeDisposable.fromDisposables([
+      IDisposable compositeDisposable = new CompositeDisposable.fromDisposables([
         disposable1,
         disposable2,
         disposable3]);
@@ -68,14 +70,15 @@ disposable_tests() {
     test('immediately dispose items added to a CompositeDisposable that was already disposed', () {
       // Arrange
       int disposedCount = 0;
-      IDisposable disposable = Disposable.create(() => disposedCount++);
+      var callback = ([_]) { disposedCount++; };
+      IDisposable disposable = new Disposable(callback);
 
-      CompositeDisposable compositeDisposable = CompositeDisposable.empty();
+      CompositeDisposable compositeDisposable = new CompositeDisposable.empty();
 
       // Act
       compositeDisposable.dispose();
       expect(disposedCount, 0, reason: 'should not have been disposed yet');
-      compositeDisposable.add(Disposable.create(() => disposedCount++));
+      compositeDisposable.add(new Disposable(([_]) => disposedCount++));
 
       // Assert
       expect(disposedCount, 1, reason: 'should have been disposed without calling dispose on the composite');
@@ -84,9 +87,10 @@ disposable_tests() {
     test('dispose and remove an item from CopositeDisposable', () {
       // Arrange
       int disposedCount = 0;
-      IDisposable disposable = Disposable.create(() => disposedCount++);
+      var callback = ([_]) { disposedCount++; };
+      IDisposable disposable = new Disposable(callback);
 
-      CompositeDisposable compositeDisposable = CompositeDisposable.fromDisposables([disposable]);
+      CompositeDisposable compositeDisposable = new CompositeDisposable.fromDisposables([disposable]);
       expect(disposedCount, 0, reason: 'should not have been disposed yet');
 
       // Act
@@ -99,10 +103,11 @@ disposable_tests() {
     test('dispose and remove all items from CompositeDisposable without triggering a dispose on the composite itself', () {
       // Arrange
       int disposedCount = 0;
-      IDisposable disposable1 = Disposable.create(() => disposedCount++);
-      IDisposable disposable2 = Disposable.create(() => disposedCount++);
+      var callback = ([_]) { disposedCount++; };
+      IDisposable disposable1 = new Disposable(callback);
+      IDisposable disposable2 = new Disposable(callback);
 
-      CompositeDisposable compositeDisposable = CompositeDisposable.fromDisposables([disposable1]);
+      CompositeDisposable compositeDisposable = new CompositeDisposable.fromDisposables([disposable1]);
 
       expect(disposedCount, 0, reason: 'should not have been disposed yet');
 
@@ -119,12 +124,13 @@ disposable_tests() {
     test('properly dispose items added to CompositeDisposable prior to it being disposed', () {
       // Arrange
       int disposedCount = 0;
-      IDisposable disposable = Disposable.create(() => disposedCount++);
+      var callback = ([_]) { disposedCount++; };
+      IDisposable disposable = new Disposable(callback);
 
-      CompositeDisposable compositeDisposable = CompositeDisposable.empty();
+      CompositeDisposable compositeDisposable = new CompositeDisposable.empty();
 
       // Act
-      compositeDisposable.add(Disposable.create(() => disposedCount++));
+      compositeDisposable.add(new Disposable(([_]) => disposedCount++));
       expect(disposedCount, 0, reason: 'should not have been disposed yet');
 
       compositeDisposable.dispose();
@@ -138,7 +144,7 @@ disposable_tests() {
       bool disposed = false;
 
       // Act
-      using(Disposable.create(() => disposed = true), (disposable) {
+      using(new Disposable(([_]) => disposed = true), (disposable) {
         expect(disposed, false);
       });
 
@@ -151,7 +157,7 @@ disposable_tests() {
       bool disposed = false;
 
       // Act
-      usingAsync(Disposable.create(() => disposed = true), (disposable) {
+      usingAsync(new Disposable(([_]) => disposed = true), (disposable) {
         expect(disposed, false, reason: 'should not have disposed inside the main method scope');
 
         return new Future.sync(() {

@@ -2,9 +2,58 @@ part of jester_test;
 
 sequence_tests() {
 
+  group('-seq_subscription- should', () {
+
+    test('patch observable values to observer', () {
+      // Arrange
+      List<int> collected = new List<int>();
+
+      // Act
+      SeqSubscription subscription = new SeqSubscription(
+          (int value) => collected.add(value),
+          (Action<int> observable) => observable(10));
+
+      // Assert
+      expect(collected.length, 1);
+      expect(collected[0], 10);
+    });
+
+    test('patch multiple values to observer', () {
+
+    });
+  });
+
   group('-Seq- should', () {
 
+    test('not block with no listeners', () {
+      // Arrange
+      SeqSource source = new SeqSource();
+      Seq sequence = source.sequence;
+
+      // Act
+      //source.next(10);
+
+      // Assert
+      expect(true, true, reason: 'will not get here if source.next blocks');
+    });
+
       test('be awesome', () {
+        SeqSource source = new SeqSource();
+
+        Seq sequence = source.sequence;
+
+        List<int> collected = new List<int>();
+
+        IDisposable subscription = sequence.sip((int event) => collected.add(event));
+
+        source.next(10);
+
+        // Assert
+        expect(collected.length, 1);
+        expect(collected[0], 10);
+
+        subscription.dispose();
+
         /*
         // Arrange
         SeqSource seqSource = SeqSource.fromIterable([10, 20, 30, 40]);

@@ -1,7 +1,7 @@
 part of jester;
 
 /// JFuture provides a wrapper around the standard Future library
-/// Ostensibly the main purpose is to enable some fun operators
+/// Ostensibly the main purpose is to enable future extension
 class JFuture<T> implements Future<T> {
   final Future<T> _future;
 
@@ -51,7 +51,7 @@ class JFuture<T> implements Future<T> {
     return $(_future.catchError(onError, test: test));
   }
 
-  JFuture<T> whenComplete(action()) {
+  JFuture<T> whenComplete(void action()) {
     return $(_future.whenComplete(action));
   }
 

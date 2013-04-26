@@ -12,10 +12,11 @@ jfuture_tests() {
       // Act
       completer.complete('data');
 
-      future.then(expectAsync1((value) {
+      future.then((value) {
         // Assert
         expect(value, 'data');
-      }));
+      })
+      .then(expectAsync1((_) { }));
     });
 
     test('handle catchError as Future does', () {
@@ -30,25 +31,72 @@ jfuture_tests() {
       // Act
       completer.completeError('error');
 
-      errorFuture.then(expectAsync1((value) {
+      errorFuture.then((value) {
         // Assert
         expect(value, 'error');
-      }));
+      })
+      .then(expectAsync1((_) { }));
     });
 
-    test('', () {
+    test('call action after complete composing error, whenComplete and then using operators', () {
       // Arrange
       Completer completer = new Completer();
       JFuture future = JFuture.$(completer.future);
+      bool called = false;
+
+      // Assert
+      future = future
+          .catchError((error) => 'error:${error}')
+          .whenComplete(() => called = true)
+          .then((value) {
+            expect(value, 'data');
+            expect(called, true);
+          })
+          .then(expectAsync1((_) { }));
 
       // Act
       completer.complete('data');
-
-      //future | expectAsync1((value) {
-
-      //});
     });
 
+    test('call action after completeError composing error, whenComplete and then using operators', () {
+      // Arrange
+      Completer completer = new Completer();
+      JFuture future = JFuture.$(completer.future);
+      bool called = false;
+
+      // Assert
+      future = future
+          .catchError((error) => 'error:${error}')
+          .whenComplete(() => called = true)
+          .then((value) {
+            expect(value, 'error:error');
+            expect(called, true);
+          })
+          .then(expectAsync1((_) { }));
+
+      // Act
+      completer.completeError('error');
+    });
+
+    test('call action after completeError composint error, whenComplete and then using exec', () {
+      // Arrange
+      Completer completer = new Completer();
+      JFuture future = JFuture.$(completer.future);
+      bool called = false;
+
+      future = future
+          .catchError((error) => 'error:${error}')
+          .whenComplete(() => called = true)
+          .then((value) {
+              // Assert
+              expect(value, 'error:error');
+              expect(called, true);
+            })
+            .then(expectAsync1((_) { }));
+
+      // Act
+      completer.completeError('error');
+    });
   });
 
 }

@@ -68,20 +68,19 @@ message_definitions_tests() {
       test('compare MessageType sucessfully across isolates', () {
         // Arrange
         usingAsync(new SafeReceivePort(), (recPort) {
-          // To report when the value was ruturned from the isolate
-          Completer completer = new Completer();
-
           SendPort sendPort = spawnFunction(isolate_boundary);
           var messageType = new MessageTypes('SECRET', 'TYPE');
           recPort.receive((message, replyTo) {
-            completer.complete(message);
+            recPort.dispose(message);
           });
 
           // Act
           sendPort.send(messageType.uid, recPort.toSendPort());
 
-          return completer.future;
-        }).then(expectAsync1((Iterable<int> result) {
+          return recPort.disposed;
+        })
+        .then(expectAsync1((Iterable<int> result) {
+          // Assert
           if(result == null) {
             expect(false, true, reason: 'result was null');
           }
@@ -92,20 +91,18 @@ message_definitions_tests() {
       test('compare different MessageType sucessfully across isolates', () {
         // Arrange
         usingAsync(new SafeReceivePort(), (recPort) {
-          // To report when the value was ruturned from the isolate
-          Completer completer = new Completer();
-
           SendPort sendPort = spawnFunction(isolate_boundary);
           var messageType = new MessageTypes('SECRET', 'WRONG');
           recPort.receive((message, replyTo) {
-            completer.complete(message);
+            recPort.dispose(message);
           });
 
           // Act
           sendPort.send(messageType.uid, recPort.toSendPort());
 
-          return completer.future;
-        }).then(expectAsync1((Iterable<int> result) {
+          return recPort.disposed;
+        })
+        .then(expectAsync1((Iterable<int> result) {
           if(result == null) {
             expect(false, true, reason: 'result was null');
           }

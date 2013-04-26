@@ -12,8 +12,3 @@ typedef void SendTo(dynamic message, [IStream from]);
 // SafeReceivePort
 typedef void ReceivePortCallback<T>(T arg, SendPort replyTo);
 
-// Disposable
-typedef void UsingFunction(IDisposable target);
-typedef Future<T> UsingAsyncFunction<T>(IDisposable target);
-typedef Future<T> UsingAsync<T>(IDisposable target, UsingAsyncFunction<T> func);
-typedef void DisposableCallback();
