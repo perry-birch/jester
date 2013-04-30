@@ -106,6 +106,41 @@ packed_int_tests() {
       expect(unpacked, 'ASDF_ASDF');
     });
 
+    test('fit correct number of chars in 128 bit int', () {
+      // Arrange
+      var value = 'arbitrarily_large_set_of_chars_to_fill_big_int_value';
+      var packed = PackedInt.pack(value, bitCount: 128);
+
+      // Act
+      var unpacked = PackedInt.unpack(packed, bitCount: 128);
+
+      // Assert
+      expect(unpacked, 'ARBITRARILY_LARGE_SET_OF_');
+    });
+
+    test('fit correct number of chars in 1024 bit int', () {
+      // Arrange
+      var value = 'arbitrarily_large_set_of_chars_to_fill_big_int_value_xone_arbitrarily_large_set_of_chars_to_fill_big_int_value_xtwo_arbitrarily_large_set_of_chars_to_fill_big_int_value_xthree_arbitrarily_large_set_of_chars_to_fill_big_int_value_xfour';
+      var packed = PackedInt.pack(value, bitCount: 1024);
+
+      // Act
+      var unpacked = PackedInt.unpack(packed, bitCount: 1024);
+
+      // Assert - 154 chars of 204 ... indicates smaller max size?
+      expect(unpacked, 'ARBITRARILY_LARGE_SET_OF_CHARS_TO_FILL_BIG_INT_VALUE_XONE_ARBITRARILY_LARGE_SET_OF_CHARS_TO_FILL_BIG_INT_VALUE_XTWO_ARBITRARILY_LARGE_SET_OF_CHARS_TO_FILL_BIG_INT_VALUE_XTHREE_ARBITRARILY_LARGE_SET_OF_CHA');
+    });
+
+    test('fit correct number of chars in 1024 bit int', () {
+      // Arrange
+      var value = 'arbitrarily_large_set_of_chars_to_fill_big_int_value_xone_arbitrarily_large_set_of_chars_to_fill_big_int_value_xtwo_arbitrarily_large_set_of_chars_to_fill_big_int_value_xthree_arbitrarily_large_set_of_chars_to_fill_big_int_value_xfour';
+      var packed = PackedInt.pack(value, bitCount: 1016);
+
+      // Act
+      var unpacked = PackedInt.unpack(packed, bitCount: 1016);
+
+      // Assert - 154 chars of 204 ... indicates smaller max size?
+      expect(unpacked, 'ARBITRARILY_LARGE_SET_OF_CHARS_TO_FILL_BIG_INT_VALUE_XONE_ARBITRARILY_LARGE_SET_OF_CHARS_TO_FILL_BIG_INT_VALUE_XTWO_ARBITRARILY_LARGE_SET_OF_CHARS_TO_FILL_BIG_INT_VALUE_XTHREE_ARBITRARILY_LARGE_SET_OF_CHA');
+    });
   });
 
 }

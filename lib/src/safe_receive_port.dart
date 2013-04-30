@@ -1,9 +1,9 @@
 part of jester;
 
-class SafeReceivePort implements ReceivePort, IFutureDisposable {
+class SafeReceivePort implements ReceivePort, IAsyncDisposable {
   final StreamController<ReceivedMessage> _streamController = new StreamController<ReceivedMessage>();
   final ReceivePort _receivePort;
-  final Disposable _disposable;
+  final AsyncDisposable _disposable;
 
   ReceivePortCallback _customCallback = (dynamic message, SendPort replyTo) { }; // noop by default
 
@@ -13,7 +13,7 @@ class SafeReceivePort implements ReceivePort, IFutureDisposable {
     if(receivePort == null) {
       receivePort = new ReceivePort();
     }
-    var disposable = new Disposable(() => receivePort.close());
+    AsyncDisposable disposable = new AsyncDisposable(() => receivePort.close());
     var safeReceivePort = new SafeReceivePort._(receivePort, disposable);
     receivePort.receive((dynamic message, SendPort replyTo) {
       safeReceivePort._customCallback(message, replyTo);
@@ -34,7 +34,8 @@ class SafeReceivePort implements ReceivePort, IFutureDisposable {
   }
 
   void close() {
-    _receivePort.close();
+    dispose();
+    //_receivePort.close();
   }
 
   SendPort toSendPort() {
@@ -42,10 +43,10 @@ class SafeReceivePort implements ReceivePort, IFutureDisposable {
   }
 
   // IFutureDisposable
-  Future get disposed => _disposable.disposed;
+  Future get disposed => _disposable.future;
 
   void dispose([dynamic value]) {
-    _disposable.dispose(value);
+    _disposable.dispose();
     //_receivePort.close();
   }
 

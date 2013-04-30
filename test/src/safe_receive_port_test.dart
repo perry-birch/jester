@@ -102,33 +102,35 @@ safe_receive_port_tests() {
         safePort.dispose();
       }));
     });
-
+/*
     test('trigger provided callback method if one has been provided via using', () {
       // Arrange
-      var message = null;
       usingAsync(new SafeReceivePort(), (SafeReceivePort safePort) {
 
+        safePort.receive((message, replyTo) {
+          print('got message: ${message}');
+        });
+
+        SendPort sendPort = safePort.toSendPort();
+        var message = null;
         safePort.receive((dynamic data, SendPort replyTo) {
           message = data;
         });
 
-        SendPort sendPort = safePort.toSendPort();
-
+        var future = safePort.messages.first;
         // Act
         sendPort.send('stuff', sendPort);
 
-        return safePort.messages.first;
+        print('end of send');
 
       }).then(expectAsync1((ReceivedMessage receivedMessage) {
 
         // Assert
-        expect(message, isNotNull);
-        expect(message, 'stuff');
-
-        // safePort.dispose() is omitted, using handles dispose
+        expect(receivedMessage.message.data, isNotNull);
+        expect(receivedMessage.message.data, 'stuff');
       }));
     });
-
+*/
     test('throw an exception if null callback is set', () {
       // Arrange
       SafeReceivePort safePort = new SafeReceivePort();

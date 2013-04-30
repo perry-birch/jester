@@ -4,5 +4,7 @@ author: Vizidrix <admin@vizidrix.com>
 description: An actor framework for Dart
 homepage: https://github.com/Vizidrix/jester
 documentation: https://github.com/Vizidrix/jester/tree/master/doc
+dependencies:
+  disposable: '>=0.0.2 <0.2.0'
 dev_dependencies:
   unittest: '>=0.4.7'

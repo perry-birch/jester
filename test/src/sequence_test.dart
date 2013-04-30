@@ -4,6 +4,18 @@ sequence_tests() {
 
   group('-seq_subscription- should', () {
 
+    /*
+Awesome Go syntax
+var c chan int
+c = make(chan int)
+c := make(chan int)
+
+// Send
+c <- 1
+
+// Receive
+value = <-c
+     */
     test('patch observable values to observer', () {
       // Arrange
       List<int> collected = new List<int>();
